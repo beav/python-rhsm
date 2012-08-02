@@ -361,8 +361,12 @@ class _Extensions2(Extensions):
 
 class Certificate(object):
     """ Parent class of all x509 certificate types. """
-    def __init__(self, x509=None, path=None, version=None, serial=None, start=None,
+    def __init__(self, cert_type=None, x509=None, path=None, version=None, serial=None, start=None,
             end=None):
+
+        if not cert_type:
+            raise CertificateException("Certificate has no type.")
+        self.cert_type = cert_type
 
         # The X509 M2crypto object for this certificate.
         # WARNING: May be None in tests
@@ -428,6 +432,7 @@ class Certificate(object):
 
 class IdentityCertificate(Certificate):
     def __init__(self, alt_name=None, subject=None, **kwargs):
+        kwargs['cert_type'] = IDENTITY_CERT
         Certificate.__init__(self, **kwargs)
 
         self.subject = subject
@@ -436,7 +441,11 @@ class IdentityCertificate(Certificate):
 
 class ProductCertificate(Certificate):
     def __init__(self, products=None, **kwargs):
+        # Make sure that we don't use a type from a child class
+        if not 'cert_type' in kwargs:
+            kwargs['cert_type'] = PRODUCT_CERT
         Certificate.__init__(self, **kwargs)
+
         # The products in this certificate. The first is treated as the
         # primary or "marketing" product.
         if products is None:
@@ -447,6 +456,7 @@ class ProductCertificate(Certificate):
 class EntitlementCertificate(ProductCertificate):
 
     def __init__(self, order=None, content=None, **kwargs):
+        kwargs['cert_type'] = ENTITLEMENT_CERT
         ProductCertificate.__init__(self, **kwargs)
         self.order = order
         self.content = content
