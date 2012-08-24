@@ -210,6 +210,7 @@ class ContentConnection(object):
                     cert_path = os.path.join(self.ent_dir, cert_file)
                     key_path = os.path.join(self.ent_dir, "%s-key.pem" % cert_file.split('.', 1)[0])
                     log.debug("Loading CA certificate: '%s'" % cert_path)
+                    print("Loading CA certificate: '%s'" % cert_path)
 
                     #FIXME: reenable res =
                     context.load_verify_info(cert_path)
@@ -426,6 +427,7 @@ class SpliceConnection:
         self.rhic = rhic or config.get('splice', 'rhic')
         self.ca_cert_dir = config.get('splice', 'ca_cert_dir')
         self.handler = handler or config.get('splice', 'prefix')
+        self.rhic_ca_cert = config.get('splice', 'rhic_ca_cert')
 
         self.insecure = insecure
         if insecure is None:
